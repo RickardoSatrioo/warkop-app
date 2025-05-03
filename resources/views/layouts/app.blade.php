@@ -22,10 +22,12 @@
                         <a class="nav-link" href="{{ route('login') }}">Login</a>
                     </li>
                 @else
-                    <!-- Jika sudah login, tampilkan nama pengguna -->
+                    <!-- Jika sudah login, tampilkan tombol dengan nama pengguna -->
                     <li class="nav-item">
-                        <span class="nav-link">Halo, {{ Auth::user()->name }}</span>
-                    </li>
+                        <a href="{{ route('profile.edit') }}" class="btn btn-outline-secondary">
+                            Halo, {{ Auth::user()->name }}
+                        </a>
+                    </li>  
                 @endguest
             </ul>
         </div>
