@@ -17,7 +17,7 @@
                         <h5 class="card-title">{{ $product->name }}</h5>
                         <p class="card-text">{{ $product->description }}</p>
                         <p class="card-text">Harga: Rp{{ number_format($product->price, 2, ',', '.') }}</p>
-                        <a href="#" class="btn btn-primary">Beli Sekarang</a>
+                      <!--  <a href="#" class="btn btn-primary">Beli Sekarang</a> -->
                     </div>
                 </div>
             </div>
