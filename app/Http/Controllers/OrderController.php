@@ -2,71 +2,83 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Product;
+use App\Models\Order;
+use Midtrans\Snap;
+use Midtrans\Config;
 
 class OrderController extends Controller
 {
-    // Menampilkan semua pesanan
-    public function index()
-    {
-        $orders = Order::all(); // Ambil semua data pesanan
-        return view('orders.index', compact('orders')); // Kirim data ke view
-    }
-
-    // Menampilkan form untuk menambah pesanan
-    public function create()
-    {
-        return view('orders.create');
-    }
-
-    // Menyimpan pesanan baru
     public function store(Request $request)
     {
-        // Validasi data
-        $request->validate([
-            'product_name' => 'required|string',
-            'quantity' => 'required|integer',
-            'price' => 'required|numeric',
-        ]);
+        $products = $request->input('products');
+        $user = Auth::user();
+        $orderItems = [];
+        $total = 0;
 
-        // Simpan pesanan ke database
-        Order::create($request->all());
+        // Simpan semua order yang valid
+        foreach ($products as $productData) {
+            $productId = $productData['id'];
+            $quantity = intval($productData['quantity']);
 
-        // Redirect ke halaman daftar pesanan
-        return redirect()->route('orders.index');
+            if ($quantity > 0) {
+                $product = Product::find($productId);
+                if ($product) {
+                    $orderItems[] = [
+                        'id' => $product->id,
+                        'price' => $product->price,
+                        'quantity' => $quantity,
+                        'name' => $product->name,
+                    ];
+
+                    $total += $product->price * $quantity;
+
+                    Order::create([
+                        'user_id' => $user->id,
+                        'product_id' => $productId,
+                        'quantity' => $quantity,
+                        'price' => $product->price * $quantity,
+                        'status' => 'konfirmasi',
+                    ]);
+                }
+            }
+        }
+
+        if ($total == 0) {
+            return redirect()->back()->with('error', 'Tidak ada produk yang dipilih.');
+        }
+
+        // Konfigurasi Midtrans
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = config('midtrans.is_sanitized');
+        Config::$is3ds = config('midtrans.is_3ds');
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => uniqid('ORDER-'),
+                'gross_amount' => $total,
+            ],
+            'customer_details' => [
+                'first_name' => $user->name,
+                'email' => $user->email,
+            ],
+            'item_details' => $orderItems
+        ];
+
+        $snapToken = Snap::getSnapToken($params);
+
+        return view('bayar', compact('snapToken', 'total'));
     }
 
-    // Menampilkan form untuk mengedit pesanan
-    public function edit(Order $order)
+    public function pembayaranSukses(Request $request)
     {
-        return view('orders.edit', compact('order'));
-    }
+        Order::where('user_id', Auth::id())
+            ->where('status', 'konfirmasi')
+            ->update(['status' => 'dibayar']);
 
-    // Memperbarui pesanan
-    public function update(Request $request, Order $order)
-    {
-        // Validasi data
-        $request->validate([
-            'product_name' => 'required|string',
-            'quantity' => 'required|integer',
-            'price' => 'required|numeric',
-        ]);
-
-        // Perbarui pesanan
-        $order->update($request->all());
-
-        // Redirect ke halaman daftar pesanan
-        return redirect()->route('orders.index');
-    }
-
-    // Menghapus pesanan
-    public function destroy(Order $order)
-    {
-        // Hapus pesanan
-        $order->delete();
-
-        // Redirect ke halaman daftar pesanan
-        return redirect()->route('orders.index');
+        return redirect()->route('status-order');
     }
 }

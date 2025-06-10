@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');  // ID produk (tanpa relasi foreign key)
             $table->integer('quantity');  // Jumlah produk yang dipesan
             $table->decimal('price', 8, 2);  // Harga total
+            $table->string('status')->default('konfirmasi');
             $table->timestamps();  // Kolom created_at dan updated_at
         });
     }

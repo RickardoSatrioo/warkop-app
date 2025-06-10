@@ -20,11 +20,4 @@ class Product extends Model
         'price',
     ];
 
-    /**
-     * Get the orders that belong to the product.
-     */
-    public function orders()
-    {
-        return $this->hasMany(Order::class);
-    }
 }

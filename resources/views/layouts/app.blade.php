@@ -15,11 +15,16 @@
         <a class="navbar-brand" href="#">Warkop Digital</a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
-                <!-- Menampilkan tombol Login atau Nama Pengguna -->
+                <!-- Menampilkan tombol Login / Register dan Pesan -->
                 @guest
-                    <!-- Jika belum login, tampilkan tombol Login -->
+                    <!-- Jika belum login, tampilkan tombol Login dan Pesan -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login') }}">Login</a>
+                        <a class="nav-link" href="{{ route('login') }}">Login / Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('pesan') }}" class="btn btn-outline-primary">
+                            Pesan
+                        </a>
                     </li>
                 @else
                     <!-- Jika sudah login, tampilkan tombol dengan nama pengguna -->
@@ -27,7 +32,13 @@
                         <a href="{{ route('profile.edit') }}" class="btn btn-outline-secondary">
                             Halo, {{ Auth::user()->name }}
                         </a>
-                    </li>  
+                    </li>
+                    <!-- Tombol Pesan di navbar -->
+                    <li class="nav-item">
+                        <a href="{{ route('pesan') }}" class="btn btn-outline-primary">
+                            Pesan
+                        </a>
+                    </li>
                 @endguest
             </ul>
         </div>
@@ -39,5 +50,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
