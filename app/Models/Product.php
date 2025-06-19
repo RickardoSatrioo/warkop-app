@@ -18,6 +18,6 @@ class Product extends Model
         'name',
         'description',
         'price',
+        'image', // <-- DITAMBAHKAN: Izinkan kolom 'image' untuk diisi
     ];
-
 }

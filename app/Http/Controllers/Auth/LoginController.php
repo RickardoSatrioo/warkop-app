@@ -25,16 +25,44 @@ class LoginController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect()->intended('/dashboard'); // Arahkan ke dashboard setelah login berhasil
+    if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+
+        // 🔀 Redirect sesuai role
+        if ($user->hasRole('admin')) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->hasRole('sander')) {
+            return redirect()->route('sander.dashboard');
+        } elseif ($user->hasRole('user')) {
+            return redirect()->route('dashboard.user');
         }
 
-        return back()->withErrors(['email' => 'Email atau password salah.']);
+        return redirect('/'); // fallback jika tidak punya role
+    }
+
+    return back()->withErrors([
+        'email' => 'Email atau password salah.',
+    ])->withInput();
+}
+
+
+    /**
+     * Logout
+     */
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/');
     }
 }
