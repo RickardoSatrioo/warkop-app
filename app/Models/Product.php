@@ -10,14 +10,12 @@ class Product extends Model
     use HasFactory;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
+     * Atribut yang bisa diisi secara massal.
      */
     protected $fillable = [
         'name',
         'description',
         'price',
-        'image', // <-- DITAMBAHKAN: Izinkan kolom 'image' untuk diisi
+        'image',
     ];
 }

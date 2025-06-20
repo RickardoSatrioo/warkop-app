@@ -12,14 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();  // ID untuk pengguna
-            $table->string('name');  // Nama pengguna
-            $table->string('email')->unique();  // Email pengguna
-            $table->timestamp('email_verified_at')->nullable();  // Verifikasi email
-            $table->string('password');  // Password pengguna
-            $table->rememberToken();  // Token untuk "remember me"
-            $table->string('alamat')->nullable();  // Menambahkan kolom alamat
-            $table->timestamps();  // Kolom created_at dan updated_at
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            // Semua kolom tambahan yang sebelumnya terpisah, sekarang digabung di sini
+            $table->string('phone')->nullable();
+            $table->text('address')->nullable(); // Menggunakan 'address' sebagai kolom alamat utama
+            $table->date('birthDate')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');  // Menghapus tabel users
+        Schema::dropIfExists('users');
     }
 };

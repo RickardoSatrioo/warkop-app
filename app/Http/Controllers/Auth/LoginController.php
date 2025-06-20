@@ -3,66 +3,42 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
+    use AuthenticatesUsers;
+
     /**
-     * Menampilkan form login.
+     * Create a new controller instance.
      *
-     * @return \Illuminate\View\View
+     * @return void
      */
-    public function showLoginForm()
+    public function __construct()
     {
-        return view('auth.login');
+        $this->middleware('guest')->except('logout');
     }
 
     /**
-     * Proses login pengguna.
+     * The user has been authenticated.
+     * Mengarahkan pengguna berdasarkan role dan tujuan sebelumnya.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function login(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
-
-    if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-        $request->session()->regenerate();
-
-        $user = Auth::user();
-
-        // 🔀 Redirect sesuai role
+    protected function authenticated(Request $request, $user)
+    {
+        // Prioritas utama: jika user adalah admin, selalu arahkan ke dashboard admin.
         if ($user->hasRole('admin')) {
             return redirect()->route('admin.dashboard');
-        } elseif ($user->hasRole('sander')) {
-            return redirect()->route('sander.dashboard');
-        } elseif ($user->hasRole('user')) {
-            return redirect()->route('dashboard.user');
         }
 
-        return redirect('/'); // fallback jika tidak punya role
-    }
-
-    return back()->withErrors([
-        'email' => 'Email atau password salah.',
-    ])->withInput();
-}
-
-
-    /**
-     * Logout
-     */
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('/');
+        // ================= PERBAIKAN DI SINI =================
+        // Untuk user lain, arahkan ke halaman yang mereka tuju sebelumnya (misal: /pesan).
+        // Jika tidak ada halaman yang dituju, arahkan ke 'dashboard' sebagai default.
+        return redirect()->intended(route('dashboard'));
+        // ======================================================
     }
 }

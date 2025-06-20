@@ -1,0 +1,44 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container my-5 text-center">
+    <h1>Selesaikan Pembayaran Anda</h1>
+    <p class="lead" style="color: var(--text-muted-custom);">Klik tombol di bawah untuk membuka jendela pembayaran.</p>
+    <button id="pay-button" class="btn btn-custom-yellow btn-lg mt-3">Bayar Sekarang</button>
+</div>
+@endsection
+
+@push('scripts')
+    <!-- Script Midtrans Snap -->
+    <script type="text/javascript"
+      src="https://app.sandbox.midtrans.com/snap/snap.js"
+      data-client-key="{{ config('midtrans.client_key') }}"></script>
+    
+    <script type="text/javascript">
+      var payButton = document.getElementById('pay-button');
+      payButton.addEventListener('click', function () {
+        // Trigger Snap
+        snap.pay('{{ $snapToken }}', {
+          onSuccess: function(result){
+            /* You may add your own implementation here */
+            alert("payment success!"); 
+            window.location.href = '{{ route("dashboard") }}';
+          },
+          onPending: function(result){
+            /* You may add your own implementation here */
+            alert("wating your payment!"); 
+            console.log(result);
+          },
+          onError: function(result){
+            /* You may add your own implementation here */
+            alert("payment failed!"); 
+            console.log(result);
+          },
+          onClose: function(){
+            /* You may add your own implementation here */
+            alert('you closed the popup without finishing the payment');
+          }
+        })
+      });
+    </script>
+@endpush

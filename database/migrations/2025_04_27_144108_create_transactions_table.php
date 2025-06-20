@@ -12,11 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
-            $table->id();  // ID untuk transaksi
-            $table->unsignedBigInteger('order_id');  // ID pesanan (tanpa relasi foreign key)
-            $table->decimal('total_amount', 10, 2);  // Total jumlah transaksi
-            $table->enum('payment_method', ['cash', 'credit', 'qr']);  // Metode pembayaran
-            $table->timestamps();  // Kolom created_at dan updated_at
+            $table->id();
+            // Menambahkan foreign key untuk integritas data
+            $table->foreignId('order_id')->constrained()->onDelete('cascade');
+            $table->decimal('total_amount', 10, 2);
+            $table->enum('payment_method', ['cash', 'credit', 'qr']);
+            $table->timestamps();
         });
     }
 
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transactions');  // Menghapus tabel transactions
+        Schema::dropIfExists('transactions');
     }
 };

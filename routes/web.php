@@ -1,65 +1,34 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\PesanController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PesanController;
+use App\Http\Controllers\PaymentController;
 
-// 🟢 Halaman utama (public)
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/pesan', [PesanController::class, 'index'])->name('pesan');
+    
+    // Rute POST untuk memproses form dari halaman 'pesan'
+    Route::post('/create-order', [PesanController::class, 'createOrder'])->name('create-order');
+    
+    // RUTE BARU (GET) untuk menampilkan halaman konfirmasi dengan aman
+    Route::get('/order/confirmation', [PesanController::class, 'showConfirmation'])->name('order.confirmation');
+    
+    // Rute untuk memproses pembayaran ke Midtrans
+    Route::post('/payment/create', [PaymentController::class, 'createTransaction'])->name('payment.create');
 });
 
-// 🟢 Dashboard umum, bisa diakses tanpa login
-Route::get('/dashboard', [ProductController::class, 'index'])->name('dashboard');
+// Rute untuk notifikasi dari Midtrans (webhook)
+Route::post('/midtrans/notification', [PaymentController::class, 'notificationHandler'])->name('midtrans.notification');
 
-// 🟡 Autentikasi
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register']);
+// Rute lain-lain
+Route::middleware('auth')->group(function () {
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+    });
+});
 
 require __DIR__.'/auth.php';
-
-// 🔐 Middleware auth
-Route::middleware('auth')->group(function () {
-    // 🛡 Admin dashboard
-    Route::middleware('role:admin')->get('/admin', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
-
-    // 🛡 Sander dashboard
-    Route::middleware('role:sander')->get('/sander', function () {
-        return view('sander.dashboard');
-    })->name('sander.dashboard');
-
-    // 🛡 User dashboard
-    Route::middleware('role:user')->get('/dashboard-user', [DashboardController::class, 'index'])->name('dashboard.user');
-
-    // 👤 Profile
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // 🛒 Checkout dan pesan
-    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
-    Route::get('/pesan', [PesanController::class, 'index'])->name('pesan');
-    Route::post('/add-to-cart/{productId}', [DashboardController::class, 'addToCart'])->name('add-to-cart');
-
-    // 💸 Order dan pembayaran
-    Route::post('/pesanan', [OrderController::class, 'store'])->name('create-order');
-    Route::get('/bayar', [OrderController::class, 'bayar'])->name('bayar');
-    Route::post('/pembayaran-sukses', [OrderController::class, 'pembayaranSukses'])->name('pembayaran-sukses');
-    Route::get('/status-order', function () {
-        return view('status-order');
-    })->name('status-order');
-
-    Route::resource('products', ProductController::class);
-});
