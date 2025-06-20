@@ -13,6 +13,13 @@ class OrderController extends Controller
 {
     public function store(Request $request)
     {
+        // === PERUBAHAN DI SINI ===
+        // Blokir admin agar tidak bisa memproses pesanan/pembayaran.
+        if (Auth::user()->hasRole('admin')) {
+            abort(403, 'AKSES DITOLAK. Admin tidak dapat memproses pembayaran.');
+        }
+        // =========================
+
         $products = $request->input('products');
         $user = Auth::user();
         $orderItems = [];

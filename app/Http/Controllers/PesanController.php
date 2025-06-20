@@ -14,6 +14,13 @@ class PesanController extends Controller
      */
     public function index()
     {
+        // === PERUBAHAN DI SINI ===
+        // Jika pengguna adalah admin, alihkan ke dashboard admin.
+        if (Auth::user()->hasRole('admin')) {
+            return redirect()->route('admin.dashboard')->with('error', 'Admin tidak diizinkan untuk membuat pesanan.');
+        }
+        // =========================
+
         $products = Product::all();
         return view('pesan', compact('products'));
     }
@@ -24,6 +31,13 @@ class PesanController extends Controller
      */
     public function createOrder(Request $request)
     {
+        // === PERUBAHAN DI SINI ===
+        // Blokir admin agar tidak bisa memproses pesanan.
+        if (Auth::user()->hasRole('admin')) {
+            abort(403, 'AKSES DITOLAK. Admin tidak dapat membuat pesanan.');
+        }
+        // =========================
+
         $request->validate([
             'products' => 'required|array',
             'products.*.quantity' => 'required|integer|min:0',
