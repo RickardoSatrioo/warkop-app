@@ -21,7 +21,78 @@
         .btn-custom-yellow:hover { background-color: #ffca2c; color: #000000; transform: translateY(-2px); }
         .footer-custom { background-color: var(--main-red); color: white; padding: 1.5rem 0; margin-top: 4rem; text-align: center; }
 
-       .product-card {
+        /* File: resources/views/layouts/app.blade.php */
+/* TAMBAHKAN CSS INI DI DALAM TAG <style> YANG SUDAH ADA */
+
+/* Panel untuk setiap item di halaman pesan */
+.order-item {
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: background-color 0.3s ease;
+    flex-wrap: wrap; /* Agar responsif di layar kecil */
+}
+.order-item:hover {
+    background-color: #3a3a3a;
+}
+
+/* Gambar thumbnail produk di halaman pesan */
+.order-item-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid var(--accent-yellow);
+}
+
+/* Pengatur Kuantitas (+/-) */
+.quantity-selector .form-control {
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid var(--text-muted-custom);
+    color: #ffffff;
+    border-radius: 0;
+    box-shadow: none;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+.quantity-selector .form-control:focus {
+    border-color: var(--accent-yellow);
+}
+
+.quantity-selector .btn-quantity {
+    background-color: var(--accent-yellow);
+    color: #000;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+.quantity-selector .btn-quantity:hover {
+    transform: scale(1.1);
+    color: #000;
+}
+
+/* Panel Checkout Terakhir */
+.checkout-panel {
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-top: 3rem;
+    border-top: 4px solid var(--main-red);
+}
+
+.product-card {
     background-color: var(--card-bg);
     border: 1px solid #444; /* Garis batas tipis untuk definisi */
     border-radius: 15px;
