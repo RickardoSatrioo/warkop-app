@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Order; // Import model Order
+use App\Models\Order; // <-- PENTING: Import model Order
 
 class AdminController extends Controller
 {
@@ -12,12 +12,13 @@ class AdminController extends Controller
      */
     public function index()
     {
-        // Mengambil semua pesanan dari database
-        // 'with' digunakan untuk mengambil data relasi (user & product) dalam satu query (Eager Loading)
-        // 'latest()' untuk mengurutkan dari yang terbaru
+        // Mengambil semua pesanan dari database.
+        // 'with()' digunakan untuk mengambil data relasi (user & product) secara efisien
+        // untuk menghindari masalah N+1 query.
+        // 'latest()' untuk mengurutkan dari yang terbaru.
         $orders = Order::with('user', 'product')->latest()->get();
 
-        // Mengirim data pesanan ke view
+        // Mengirim variabel $orders yang berisi data pesanan ke view.
         return view('admin.dashboard', compact('orders'));
     }
 }

@@ -11,7 +11,9 @@ class Order extends Model
     use HasFactory;
 
     /**
-     * Atribut yang bisa diisi secara massal.
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
      */
     protected $fillable = [
         'user_id',
@@ -19,14 +21,13 @@ class Order extends Model
         'quantity',
         'price',
         'status',
-        // Tambahkan kolom baru
         'order_code',
         'payment_status',
         'snap_token',
     ];
 
     /**
-     * Get the user that owns the order.
+     * Relasi untuk mengambil data user yang memesan.
      */
     public function user(): BelongsTo
     {
@@ -34,7 +35,7 @@ class Order extends Model
     }
 
     /**
-     * Get the product associated with the order.
+     * Relasi untuk mengambil data produk yang dipesan.
      */
     public function product(): BelongsTo
     {
