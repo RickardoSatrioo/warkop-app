@@ -5,6 +5,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PesanController;
 use App\Http\Controllers\PaymentController;
+// === TAMBAHKAN INI ===
+use App\Http\Controllers\ProductController;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -28,6 +30,12 @@ Route::post('/midtrans/notification', [PaymentController::class, 'notificationHa
 Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+        
+        // === TAMBAHKAN RUTE RESOURCE INI UNTUK KELOLA MENU ===
+        // Ini akan otomatis membuat rute untuk:
+        // index, create, store, show, edit, update, destroy
+        Route::resource('products', ProductController::class);
+        // ====================================================
     });
 });
 
