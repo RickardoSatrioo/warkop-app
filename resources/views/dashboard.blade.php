@@ -18,33 +18,39 @@
         </div>
     @endif
 
-    <div class="row gy-4">
+    {{-- gy-5 memberikan jarak vertikal yang lebih besar antar baris kartu --}}
+    <div class="row gy-5">
         @forelse ($products as $product)
             <div class="col-lg-4 col-md-6">
-                {{-- Menambahkan class 'product-card' untuk styling --}}
-                <div class="card product-card h-100">
+                {{-- Menggunakan class 'product-card' yang stylenya sudah terpusat di layout --}}
+                <div class="product-card">
 
                     @php
                         $imageName = Str::slug($product->name) . '.jpg';
                         $imageUrl = asset('images/products/' . $imageName);
                     @endphp
 
-                    <img src="{{ $imageUrl }}" 
-                         class="card-img-top" 
-                         style="height: 250px; object-fit: cover;" 
-                         alt="{{ $product->name }}"
-                         onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300?text=Gambar+Segera+Hadir';">
+                    {{-- Wrapper untuk efek zoom gambar yang rapi --}}
+                    <div class="card-img-wrapper">
+                        <img src="{{ $imageUrl }}" 
+                             class="card-img-top" 
+                             style="height: 250px; object-fit: cover;" 
+                             alt="{{ $product->name }}"
+                             onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300?text=Gambar+Segera+Hadir';">
+                    </div>
 
-                    <div class="card-body d-flex flex-column">
+                    <div class="card-body">
                         <h5 class="card-title">{{ $product->name }}</h5>
-                        <p class="card-text flex-grow-1">{{ $product->description }}</p>
-                        {{-- Menambahkan class 'price-text' untuk styling harga --}}
-                        <p class="price-text mt-3 mb-0"><b>Harga:</b> Rp{{ number_format($product->price, 0, ',', '.') }}</p>
+                        <p class="card-text">{{ $product->description }}</p>
+                        
+                        <p class="price-text">
+                            Harga: <span class="price-value">Rp{{ number_format($product->price, 0, ',', '.') }}</span>
+                        </p>
                     </div>
                 </div>
             </div>
         @empty
-            <div class="col text-center">
+            <div class="col text-center py-5">
                 <h3 class="mt-5">Mohon Maaf...</h3>
                 <p class="lead" style="color: var(--text-muted-custom);">Saat ini belum ada produk yang tersedia.</p>
             </div>

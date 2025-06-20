@@ -20,6 +20,66 @@
         .btn-custom-yellow { background-color: var(--accent-yellow); color: #000000; font-weight: 500; border: none; transition: all 0.3s ease; }
         .btn-custom-yellow:hover { background-color: #ffca2c; color: #000000; transform: translateY(-2px); }
         .footer-custom { background-color: var(--main-red); color: white; padding: 1.5rem 0; margin-top: 4rem; text-align: center; }
+
+       .product-card {
+    background-color: var(--card-bg);
+    border: 1px solid #444; /* Garis batas tipis untuk definisi */
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Memastikan kartu memiliki tinggi yang sama dalam satu baris */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.product-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent-yellow);
+    box-shadow: 0 12px 35px rgba(255, 193, 7, 0.15);
+}
+
+.product-card .card-img-wrapper {
+    overflow: hidden; /* Penting untuk efek zoom */
+}
+
+.product-card .card-img-top {
+    border-bottom: 3px solid var(--accent-yellow);
+    transition: transform 0.4s ease-in-out;
+}
+
+.product-card:hover .card-img-top {
+    transform: scale(1.08);
+}
+
+.product-card .card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Membuat body kartu mengisi sisa ruang */
+}
+
+.product-card .card-title {
+    color: var(--accent-yellow);
+    font-size: 1.5rem;
+}
+
+.product-card .card-text {
+    color: var(--text-muted-custom);
+    flex-grow: 1; /* Mendorong harga ke bagian bawah */
+}
+
+.product-card .price-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-light);
+    margin-top: auto; /* Selalu menempel di bawah */
+}
+
+.product-card .price-text .price-value {
+    color: var(--accent-yellow);
+}
     </style>
 </head>
 <body>
