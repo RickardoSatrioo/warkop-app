@@ -11,13 +11,16 @@ class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        // Bersihkan cache permission agar tidak terjadi error saat seeder dijalankan ulang
+        // Bersihkan cache permission
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
         
         // Buat roles
         $userRole = Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']);
         $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        $sanderRole = Role::firstOrCreate(['name' => 'sander', 'guard_name' => 'web']);
+        
+        // === PERUBAHAN DI SINI: Buat role 'pemilik' ===
+        $pemilikRole = Role::firstOrCreate(['name' => 'pemilik', 'guard_name' => 'web']);
+        // =============================================
 
         // Buat user biasa (jika belum ada)
         $user = User::firstOrCreate(
@@ -41,7 +44,7 @@ class RoleSeeder extends Seeder
         );
         $admin->assignRole($adminRole);
 
-        // Buat user sander (jika belum ada)
+        // === PERUBAHAN DI SINI: Buat user sander dan assign role 'pemilik' ===
         $sander = User::firstOrCreate(
             ['email' => 'sander@gmail.com'],
             [
@@ -50,6 +53,8 @@ class RoleSeeder extends Seeder
                 'phone' => '089999888777',
             ]
         );
-        $sander->assignRole($sanderRole);
+        // Tugaskan role 'pemilik' ke sander
+        $sander->assignRole($pemilikRole);
+        // ===================================================================
     }
 }

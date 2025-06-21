@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    {{-- PERUBAHAN JUDUL & IKON --}}
     <title>{{ config('app.name', 'Digiwar') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('images/web/digital_warkop-removebg-preview.png') }}">
-    {{-- ======================== --}}
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -69,6 +67,8 @@
                                 @if(Auth::user()->hasRole('admin'))
                                     <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.products.index') }}">Kelola Menu</a></li>
+                                @elseif(Auth::user()->hasRole('pemilik'))
+                                    <li><a class="dropdown-item" href="{{ route('pemilik.dashboard') }}">Dashboard Pemilik</a></li>
                                 @else
                                     <li><a class="dropdown-item" href="{{ route('orders.my') }}">Pesanan Saya</a></li>
                                     <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Edit Profil</a></li>
