@@ -16,26 +16,22 @@
     <script type="text/javascript">
       var payButton = document.getElementById('pay-button');
       payButton.addEventListener('click', function () {
-        // Trigger Snap
         snap.pay('{{ $snapToken }}', {
           onSuccess: function(result){
             /* === PERUBAHAN DI SINI === */
-            // Arahkan ke halaman status pesanan setelah pembayaran berhasil.
-            window.location.href = '{{ route("order.status") }}';
+            // Arahkan ke halaman status pesanan dengan menyertakan kode pesanan.
+            window.location.href = '{{ route("order.status", ["order_code" => $transactionCode]) }}';
             /* ========================= */
           },
           onPending: function(result){
-            /* You may add your own implementation here */
             alert("Menunggu pembayaran Anda!"); 
             console.log(result);
           },
           onError: function(result){
-            /* You may add your own implementation here */
             alert("Pembayaran gagal!"); 
             console.log(result);
           },
           onClose: function(){
-            /* You may add your own implementation here */
             alert('Anda menutup pop-up tanpa menyelesaikan pembayaran.');
           }
         })

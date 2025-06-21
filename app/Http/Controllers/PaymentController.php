@@ -24,20 +24,16 @@ class PaymentController extends Controller
             abort(403, 'AKSES DITOLAK. Admin tidak dapat memproses pembayaran.');
         }
 
-        // Validasi request, tambahkan validasi untuk 'notes'
         $request->validate([
             'total_price' => 'required|numeric',
             'order_ids' => 'required|array',
             'order_ids.*' => 'exists:orders,id',
-            'notes' => 'nullable|string|max:1000', // Catatan bersifat opsional
+            'notes' => 'nullable|string|max:1000',
         ]);
         
-        // === PERUBAHAN DI SINI: Simpan catatan ke database ===
-        // Jika ada catatan yang diisi, perbarui semua pesanan terkait.
         if ($request->filled('notes')) {
             Order::whereIn('id', $request->order_ids)->update(['notes' => $request->notes]);
         }
-        // =======================================================
         
         $orders = Order::whereIn('id', $request->order_ids)->with('product')->get();
 
@@ -77,7 +73,10 @@ class PaymentController extends Controller
                 'snap_token' => $snapToken,
             ]);
 
-            return view('payment', compact('snapToken'));
+            // === PERUBAHAN DI SINI ===
+            // Kirim 'transactionCode' (order_code) ke view
+            return view('payment', compact('snapToken', 'transactionCode'));
+            // =========================
 
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);

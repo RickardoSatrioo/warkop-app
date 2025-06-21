@@ -21,73 +21,78 @@
         </div>
     @endif
 
-    <div class="card product-card">
-        <div class="card-body p-4">
-            <h4 class="card-title mb-4">Daftar Pesanan Masuk</h4>
-            <div class="table-responsive">
-                <table class="table table-dark table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Kode Pesanan</th>
-                            <th>Nama Pemesan</th>
-                            <th>Produk</th>
-                            {{-- === TAMBAHKAN KOLOM BARU === --}}
-                            <th>Catatan</th>
-                            <th>Jumlah</th>
-                            <th>Total Harga</th>
-                            <th>Status Pesanan</th>
-                            <th>Status Pembayaran</th>
-                            <th>Tanggal Pesan</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($orders as $order)
+    {{-- Looping untuk setiap grup pesanan berdasarkan order_code --}}
+    @forelse ($ordersByCode as $code => $orders)
+        <div class="card product-card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h5 class="mb-0">
+                        {{-- === PERUBAHAN DI SINI: Cek apakah kode pesanan ada === --}}
+                        @if ($code)
+                            Pesanan <span class="text-warning">#{{ $code }}</span>
+                        @else
+                            Pesanan <span class="text-danger">#KODE INVALID</span>
+                        @endif
+                    </h5>
+                    <small class="text-muted">Pemesan: {{ $orders->first()->user->name ?? 'User Dihapus' }} | Tanggal: {{ $orders->first()->created_at->format('d M Y, H:i') }}</small>
+                </div>
+                <div class="mt-2 mt-md-0">
+                    {{-- === PERUBAHAN DI SINI: Hanya tampilkan form jika kode valid === --}}
+                    @if ($code)
+                        <form action="{{ route('admin.orders.updateStatus', $code) }}" method="POST" class="d-flex align-items-center">
+                            @csrf
+                            <select name="status" class="form-select form-select-sm me-2" style="width: 180px;">
+                                @php
+                                    $statuses = ['menunggu konfirmasi', 'di masak', 'di antar', 'selesai', 'dibatalkan'];
+                                    $currentStatus = $orders->first()->status;
+                                @endphp
+                                @foreach ($statuses as $status)
+                                    <option value="{{ $status }}" @if($status == $currentStatus) selected @endif>
+                                        {{ ucfirst($status) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                        </form>
+                    @else
+                        {{-- Tampilkan pesan jika kode tidak valid --}}
+                        <span class="badge bg-secondary">Data Lama / Tidak Valid</span>
+                    @endif
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle mb-0">
+                        <thead>
                             <tr>
-                                <td>#{{ $order->id }}</td>
-                                <td>{{ $order->order_code ?: 'N/A' }}</td>
-                                <td>{{ $order->user->name ?? 'User Dihapus' }}</td>
-                                <td>{{ $order->product->name ?? 'Produk Dihapus' }}</td>
-                                {{-- === TAMPILKAN DATA CATATAN === --}}
-                                <td style="min-width: 150px;">{{ $order->notes ?: '-' }}</td>
-                                <td>{{ $order->quantity }}</td>
-                                <td>Rp{{ number_format($order->price * $order->quantity, 0, ',', '.') }}</td>
-                                <td>
-                                    @if($order->status === 'selesai')
-                                        <span class="badge bg-success">Selesai</span>
-                                    @elseif(in_array($order->status, ['konfirmasi', 'pending', 'diproses']))
-                                        <span class="badge bg-warning text-dark">{{ ucfirst($order->status) }}</span>
-                                    @elseif($order->status === 'dibatalkan')
-                                        <span class="badge bg-danger">Dibatalkan</span>
-                                    @else
-                                        <span class="badge bg-info">{{ ucfirst($order->status) }}</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($order->payment_status === 'paid')
-                                        <span class="badge bg-primary">Lunas</span>
-                                    @else
-                                        <span class="badge bg-danger">Belum Lunas</span>
-                                    @endif
-                                </td>
-                                <td>{{ \Carbon\Carbon::parse($order->created_at)->format('d M Y, H:i') }}</td>
-                                <td>
-                                    <a href="#" class="btn btn-sm btn-info">
-                                        Detail
-                                    </a>
-                                </td>
+                                <th>Produk</th>
+                                <th>Jumlah</th>
+                                <th>Harga Satuan</th>
+                                <th>Total Harga</th>
+                                <th>Catatan</th>
                             </tr>
-                        @empty
-                            {{-- === PERBARUI COLSPAN === --}}
-                            <tr>
-                                <td colspan="11" class="text-center py-4">Belum ada pesanan yang masuk.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($orders as $order)
+                                <tr>
+                                    <td>{{ $order->product->name ?? 'Produk Dihapus' }}</td>
+                                    <td>{{ $order->quantity }}</td>
+                                    <td>Rp{{ number_format($order->price, 0, ',', '.') }}</td>
+                                    <td>Rp{{ number_format($order->price * $order->quantity, 0, ',', '.') }}</td>
+                                    <td style="min-width: 200px;">{{ $order->notes ?: '-' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
+    @empty
+        <div class="card product-card">
+            <div class="card-body text-center p-5">
+                <h4 class="card-title">Belum ada pesanan yang masuk.</h4>
+            </div>
+        </div>
+    @endforelse
 </div>
 @endsection

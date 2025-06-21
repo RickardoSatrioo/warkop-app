@@ -38,10 +38,7 @@ class PesanController extends Controller
 
         $orderIds = [];
         
-        // === PERUBAHAN DI SINI ===
-        // Buat satu kode pesanan yang sama untuk semua item dalam transaksi ini
         $groupOrderCode = 'WARKOP-' . time() . '-' . Auth::id();
-        // =========================
 
         foreach ($request->products as $productId => $details) {
             if ($details['quantity'] > 0) {
@@ -52,11 +49,11 @@ class PesanController extends Controller
                         'product_id' => $product->id,
                         'quantity' => (int)$details['quantity'],
                         'price' => $product->price,
-                        'status' => 'konfirmasi',
-                        'payment_status' => 'pending',
                         // === PERUBAHAN DI SINI ===
-                        'order_code' => $groupOrderCode, // Gunakan kode grup yang sama
+                        'status' => 'menunggu konfirmasi', // Status default baru
                         // =========================
+                        'payment_status' => 'pending',
+                        'order_code' => $groupOrderCode,
                     ]);
                     $orderIds[] = $order->id;
                 }

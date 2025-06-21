@@ -39,6 +39,10 @@
         .product-card .price-text { font-family: 'Poppins', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text-light); margin-top: auto; }
         .product-card .price-text .price-value { color: var(--accent-yellow); }
     </style>
+    
+    {{-- === TAMBAHKAN BARIS INI === --}}
+    @stack('styles')
+    {{-- ============================ --}}
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
@@ -61,11 +65,7 @@
                             <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
                                 @if(Auth::user()->hasRole('admin'))
                                     <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
-                                    
-                                    {{-- === TAMBAHKAN LINK INI === --}}
                                     <li><a class="dropdown-item" href="{{ route('admin.products.index') }}">Kelola Menu</a></li>
-                                    {{-- ========================== --}}
-
                                 @endif
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
