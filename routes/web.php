@@ -6,6 +6,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PesanController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController; // <-- Tambahkan ini
+use App\Http\Controllers\ProfileController; // <-- Tambahkan ini
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -26,6 +28,12 @@ Route::middleware('auth')->group(function () {
         
         return view('status-order', compact('orders'));
     })->name('order.status');
+
+     // === RUTE BARU UNTUK PROFIL DAN PESANAN SAYA ===
+    Route::get('/my-orders', [OrderController::class, 'myOrders'])->name('orders.my');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    // ===============================================
 });
 
 Route::post('/midtrans/notification', [PaymentController::class, 'notificationHandler'])->name('midtrans.notification');

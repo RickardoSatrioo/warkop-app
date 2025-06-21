@@ -40,9 +40,7 @@
         .product-card .price-text .price-value { color: var(--accent-yellow); }
     </style>
     
-    {{-- === TAMBAHKAN BARIS INI === --}}
     @stack('styles')
-    {{-- ============================ --}}
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
@@ -63,9 +61,14 @@
                                 Halo, {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                                {{-- === PERUBAHAN DI SINI === --}}
                                 @if(Auth::user()->hasRole('admin'))
                                     <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.products.index') }}">Kelola Menu</a></li>
+                                @else
+                                    {{-- Menu untuk user biasa --}}
+                                    <li><a class="dropdown-item" href="{{ route('orders.my') }}">Pesanan Saya</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Edit Profil</a></li>
                                 @endif
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
@@ -74,6 +77,7 @@
                                         <button type="submit" class="dropdown-item">Logout</button>
                                     </form>
                                 </li>
+                                {{-- ========================== --}}
                             </ul>
                         </li>
                     @endguest

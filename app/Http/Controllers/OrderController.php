@@ -11,21 +11,34 @@ use Midtrans\Config;
 
 class OrderController extends Controller
 {
+    /**
+     * Method baru untuk menampilkan halaman riwayat pesanan pengguna.
+     */
+    public function myOrders()
+    {
+        $user = Auth::user();
+        
+        // Ambil pesanan milik user yang sedang login, kelompokkan berdasarkan kode pesanan
+        $ordersByCode = $user->orders()
+                             ->with('product')
+                             ->latest()
+                             ->get()
+                             ->groupBy('order_code');
+
+        return view('orders.index', compact('ordersByCode'));
+    }
+
     public function store(Request $request)
     {
-        // === PERUBAHAN DI SINI ===
-        // Blokir admin agar tidak bisa memproses pesanan/pembayaran.
         if (Auth::user()->hasRole('admin')) {
             abort(403, 'AKSES DITOLAK. Admin tidak dapat memproses pembayaran.');
         }
-        // =========================
 
         $products = $request->input('products');
         $user = Auth::user();
         $orderItems = [];
         $total = 0;
 
-        // Simpan semua order yang valid
         foreach ($products as $productData) {
             $productId = $productData['id'];
             $quantity = intval($productData['quantity']);
@@ -57,7 +70,6 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Tidak ada produk yang dipilih.');
         }
 
-        // Konfigurasi Midtrans
         Config::$serverKey = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized = config('midtrans.is_sanitized');
