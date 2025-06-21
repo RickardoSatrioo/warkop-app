@@ -19,7 +19,7 @@
 
             <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                @method('PUT')
+                @method('PUT') {{-- Method untuk update --}}
 
                 <div class="mb-3">
                     <label for="name" class="form-label">Nama Menu</label>
@@ -44,9 +44,27 @@
                         </div>
                     @endif
                 </div>
-                <button type="submit" class="btn btn-primary">Perbarui Menu</button>
-                <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Batal</a>
+                
+                {{-- Tombol Aksi --}}
+                <div class="d-flex justify-content-between">
+                    {{-- Tombol Hapus ada di kiri --}}
+                    <button type="button" class="btn btn-danger" onclick="document.getElementById('delete-form').submit();">
+                        Hapus Menu
+                    </button>
+                    {{-- Tombol Simpan & Batal ada di kanan --}}
+                    <div>
+                        <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Batal</a>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    </div>
+                </div>
             </form>
+
+            {{-- Form tersembunyi khusus untuk aksi Hapus --}}
+            <form id="delete-form" action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="d-none" onsubmit="return confirm('Apakah Anda benar-benar yakin ingin menghapus menu ini secara permanen?');">
+                @csrf
+                @method('DELETE')
+            </form>
+
         </div>
     </div>
 </div>

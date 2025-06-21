@@ -25,13 +25,21 @@
                 {{-- Menggunakan class 'product-card' yang stylenya sudah terpusat di layout --}}
                 <div class="product-card">
 
+                    {{-- === PERBAIKAN DI SINI === --}}
                     @php
-                        $imageName = Str::slug($product->name) . '.jpg';
-                        $imageUrl = asset('images/products/' . $imageName);
+                        // Logika diperbaiki untuk mengambil gambar dari database.
+                        // Cek apakah produk memiliki record gambar di database.
+                        // Jika ada, buat URL ke folder 'storage/products'.
+                        // Jika tidak ada, gunakan URL gambar placeholder.
+                        $imageUrl = $product->image
+                                    ? asset('storage/products/' . $product->image)
+                                    : 'https://via.placeholder.com/400x300?text=Gambar+Segera+Hadir';
                     @endphp
+                    {{-- ========================= --}}
 
                     {{-- Wrapper untuk efek zoom gambar yang rapi --}}
                     <div class="card-img-wrapper">
+                        {{-- 'src' sekarang menggunakan $imageUrl yang sudah diperbaiki --}}
                         <img src="{{ $imageUrl }}" 
                              class="card-img-top" 
                              style="height: 250px; object-fit: cover;" 
