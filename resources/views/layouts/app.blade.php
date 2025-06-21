@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'Warkop Digital') }}</title>
+    
+    {{-- PERUBAHAN JUDUL & IKON --}}
+    <title>{{ config('app.name', 'Digiwar') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/web/digital_warkop-removebg-preview.png') }}">
+    {{-- ======================== --}}
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,12 +66,10 @@
                                 Halo, {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
-                                {{-- === PERUBAHAN DI SINI === --}}
                                 @if(Auth::user()->hasRole('admin'))
                                     <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.products.index') }}">Kelola Menu</a></li>
                                 @else
-                                    {{-- Menu untuk user biasa --}}
                                     <li><a class="dropdown-item" href="{{ route('orders.my') }}">Pesanan Saya</a></li>
                                     <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Edit Profil</a></li>
                                 @endif
@@ -77,7 +80,6 @@
                                         <button type="submit" class="dropdown-item">Logout</button>
                                     </form>
                                 </li>
-                                {{-- ========================== --}}
                             </ul>
                         </li>
                     @endguest
