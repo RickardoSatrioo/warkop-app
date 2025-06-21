@@ -24,11 +24,20 @@ class PaymentController extends Controller
             abort(403, 'AKSES DITOLAK. Admin tidak dapat memproses pembayaran.');
         }
 
+        // Validasi request, tambahkan validasi untuk 'notes'
         $request->validate([
             'total_price' => 'required|numeric',
             'order_ids' => 'required|array',
             'order_ids.*' => 'exists:orders,id',
+            'notes' => 'nullable|string|max:1000', // Catatan bersifat opsional
         ]);
+        
+        // === PERUBAHAN DI SINI: Simpan catatan ke database ===
+        // Jika ada catatan yang diisi, perbarui semua pesanan terkait.
+        if ($request->filled('notes')) {
+            Order::whereIn('id', $request->order_ids)->update(['notes' => $request->notes]);
+        }
+        // =======================================================
         
         $orders = Order::whereIn('id', $request->order_ids)->with('product')->get();
 
@@ -36,11 +45,7 @@ class PaymentController extends Controller
             return redirect()->back()->withErrors(['error' => 'Pesanan tidak ditemukan.']);
         }
         
-        // === PERUBAHAN DI SINI ===
-        // Gunakan order_code yang sudah ada dari pesanan pertama.
-        // Semua pesanan dalam grup ini memiliki kode yang sama.
         $transactionCode = $orders->first()->order_code;
-        // =========================
 
         $item_details = [];
         foreach($orders as $order) {
@@ -54,7 +59,7 @@ class PaymentController extends Controller
 
         $params = [
             'transaction_details' => [
-                'order_id' => $transactionCode, // Gunakan kode yang sudah ada
+                'order_id' => $transactionCode,
                 'gross_amount' => $request->total_price,
             ],
             'item_details' => $item_details,
@@ -68,12 +73,9 @@ class PaymentController extends Controller
         try {
             $snapToken = Snap::getSnapToken($params);
             
-            // === PERUBAHAN DI SINI ===
-            // Cukup perbarui snap_token, karena order_code sudah benar.
             Order::whereIn('id', $request->order_ids)->update([
                 'snap_token' => $snapToken,
             ]);
-            // =========================
 
             return view('payment', compact('snapToken'));
 
@@ -89,7 +91,6 @@ class PaymentController extends Controller
         
         if ($hashed == $request->signature_key) {
             if ($request->transaction_status == 'capture' || $request->transaction_status == 'settlement') {
-                // Semua pesanan dengan order_code yang sama akan diperbarui statusnya.
                 Order::where('order_code', $request->order_id)->update(['payment_status' => 'paid']);
             }
         }

@@ -5,6 +5,7 @@
         <h1 class="text-center">Konfirmasi Pesanan</h1>
         <p class="text-center lead" style="color: var(--text-muted-custom);">Berikut adalah rincian pesanan Anda.</p>
 
+        {{-- Rincian Pesanan --}}
         <div class="card product-card mt-4">
             <div class="card-body">
                 <ul class="list-group list-group-flush">
@@ -25,15 +26,27 @@
             </div>
         </div>
         
-        <!-- Tombol untuk melanjutkan ke pembayaran Midtrans -->
-        <form action="{{ route('payment.create') }}" method="POST" class="mt-4 text-center">
+        {{-- Form Pembayaran dan Catatan --}}
+        <form action="{{ route('payment.create') }}" method="POST" class="mt-3 text-center">
             @csrf
             {{-- Kirim total harga dan ID pesanan-pesanan yang baru dibuat --}}
             <input type="hidden" name="total_price" value="{{ $totalPrice }}">
             @foreach ($newlyCreatedOrders as $order)
                 <input type="hidden" name="order_ids[]" value="{{ $order->id }}">
             @endforeach
-            <button type="submit" class="btn btn-custom-yellow btn-lg">Lanjutkan ke Pembayaran</button>
+
+            {{-- === FITUR BARU DI SINI: Kotak Catatan Pesanan === --}}
+            <div class="card product-card mt-4">
+                <div class="card-body text-start p-4">
+                    <div class="mb-0">
+                        <label for="notes" class="form-label h5" style="color: var(--accent-yellow);">Catatan untuk Penjual (Opsional)</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Contoh: Jangan pedas, tidak pakai bawang, dll." style="background-color: #3a3a3a; color: white; border-color: #555;"></textarea>
+                    </div>
+                </div>
+            </div>
+            {{-- =============================================== --}}
+
+            <button type="submit" class="btn btn-custom-yellow btn-lg mt-4">Lanjutkan ke Pembayaran</button>
         </form>
     </div>
 @endsection

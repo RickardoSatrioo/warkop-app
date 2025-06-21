@@ -14,13 +14,17 @@
             {{ session('success') }}
         </div>
     @endif
+    
+    @if (session('error'))
+        <div class="alert alert-danger" role="alert">
+            {{ session('error') }}
+        </div>
+    @endif
 
-    {{-- Menggunakan class 'product-card' agar konsisten dengan tema --}}
     <div class="card product-card">
         <div class="card-body p-4">
             <h4 class="card-title mb-4">Daftar Pesanan Masuk</h4>
             <div class="table-responsive">
-                {{-- Menggunakan 'table-dark' agar cocok dengan latar belakang kartu --}}
                 <table class="table table-dark table-hover align-middle">
                     <thead>
                         <tr>
@@ -28,6 +32,8 @@
                             <th>Kode Pesanan</th>
                             <th>Nama Pemesan</th>
                             <th>Produk</th>
+                            {{-- === TAMBAHKAN KOLOM BARU === --}}
+                            <th>Catatan</th>
                             <th>Jumlah</th>
                             <th>Total Harga</th>
                             <th>Status Pesanan</th>
@@ -43,13 +49,14 @@
                                 <td>{{ $order->order_code ?: 'N/A' }}</td>
                                 <td>{{ $order->user->name ?? 'User Dihapus' }}</td>
                                 <td>{{ $order->product->name ?? 'Produk Dihapus' }}</td>
+                                {{-- === TAMPILKAN DATA CATATAN === --}}
+                                <td style="min-width: 150px;">{{ $order->notes ?: '-' }}</td>
                                 <td>{{ $order->quantity }}</td>
-                                {{-- Menghitung total harga dari harga satuan x jumlah --}}
                                 <td>Rp{{ number_format($order->price * $order->quantity, 0, ',', '.') }}</td>
                                 <td>
                                     @if($order->status === 'selesai')
                                         <span class="badge bg-success">Selesai</span>
-                                    @elseif($order->status === 'konfirmasi' || $order->status === 'pending' || $order->status === 'diproses')
+                                    @elseif(in_array($order->status, ['konfirmasi', 'pending', 'diproses']))
                                         <span class="badge bg-warning text-dark">{{ ucfirst($order->status) }}</span>
                                     @elseif($order->status === 'dibatalkan')
                                         <span class="badge bg-danger">Dibatalkan</span>
@@ -72,8 +79,9 @@
                                 </td>
                             </tr>
                         @empty
+                            {{-- === PERBARUI COLSPAN === --}}
                             <tr>
-                                <td colspan="10" class="text-center py-4">Belum ada pesanan yang masuk.</td>
+                                <td colspan="11" class="text-center py-4">Belum ada pesanan yang masuk.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -83,4 +91,3 @@
     </div>
 </div>
 @endsection
-
