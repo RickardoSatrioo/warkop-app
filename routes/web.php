@@ -5,7 +5,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PesanController;
 use App\Http\Controllers\PaymentController;
-// === TAMBAHKAN INI ===
 use App\Http\Controllers\ProductController;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -13,14 +12,18 @@ Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::middleware('auth')->group(function () {
     Route::get('/pesan', [PesanController::class, 'index'])->name('pesan');
     
-    // Rute POST untuk memproses form dari halaman 'pesan'
     Route::post('/create-order', [PesanController::class, 'createOrder'])->name('create-order');
     
-    // RUTE BARU (GET) untuk menampilkan halaman konfirmasi dengan aman
     Route::get('/order/confirmation', [PesanController::class, 'showConfirmation'])->name('order.confirmation');
     
-    // Rute untuk memproses pembayaran ke Midtrans
     Route::post('/payment/create', [PaymentController::class, 'createTransaction'])->name('payment.create');
+
+    // === TAMBAHKAN RUTE DI BAWAH INI ===
+    // Rute untuk menampilkan halaman status pesanan setelah pembayaran berhasil.
+    Route::get('/order/status', function () {
+        return view('status-order');
+    })->name('order.status');
+    // ===================================
 });
 
 // Rute untuk notifikasi dari Midtrans (webhook)
@@ -31,11 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
         
-        // === TAMBAHKAN RUTE RESOURCE INI UNTUK KELOLA MENU ===
-        // Ini akan otomatis membuat rute untuk:
-        // index, create, store, show, edit, update, destroy
         Route::resource('products', ProductController::class);
-        // ====================================================
     });
 });
 

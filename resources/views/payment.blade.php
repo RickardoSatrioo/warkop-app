@@ -9,7 +9,6 @@
 @endsection
 
 @push('scripts')
-    <!-- Script Midtrans Snap -->
     <script type="text/javascript"
       src="https://app.sandbox.midtrans.com/snap/snap.js"
       data-client-key="{{ config('midtrans.client_key') }}"></script>
@@ -20,23 +19,24 @@
         // Trigger Snap
         snap.pay('{{ $snapToken }}', {
           onSuccess: function(result){
-            /* You may add your own implementation here */
-            alert("payment success!"); 
-            window.location.href = '{{ route("dashboard") }}';
+            /* === PERUBAHAN DI SINI === */
+            // Arahkan ke halaman status pesanan setelah pembayaran berhasil.
+            window.location.href = '{{ route("order.status") }}';
+            /* ========================= */
           },
           onPending: function(result){
             /* You may add your own implementation here */
-            alert("wating your payment!"); 
+            alert("Menunggu pembayaran Anda!"); 
             console.log(result);
           },
           onError: function(result){
             /* You may add your own implementation here */
-            alert("payment failed!"); 
+            alert("Pembayaran gagal!"); 
             console.log(result);
           },
           onClose: function(){
             /* You may add your own implementation here */
-            alert('you closed the popup without finishing the payment');
+            alert('Anda menutup pop-up tanpa menyelesaikan pembayaran.');
           }
         })
       });
