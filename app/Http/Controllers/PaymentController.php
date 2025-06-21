@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use Illuminate\Support\Facades\Auth;
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -11,7 +12,6 @@ class PaymentController extends Controller
 {
     public function __construct()
     {
-        // Konfigurasi Midtrans
         Config::$serverKey = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized = config('midtrans.is_sanitized');
@@ -20,22 +20,27 @@ class PaymentController extends Controller
 
     public function createTransaction(Request $request)
     {
-        // Validasi request
+        if (Auth::user()->hasRole('admin')) {
+            abort(403, 'AKSES DITOLAK. Admin tidak dapat memproses pembayaran.');
+        }
+
         $request->validate([
             'total_price' => 'required|numeric',
             'order_ids' => 'required|array',
             'order_ids.*' => 'exists:orders,id',
         ]);
         
-        // Ambil semua order berdasarkan ID yang dikirim
-        $orders = Order::whereIn('id', $request->order_ids)->get();
+        $orders = Order::whereIn('id', $request->order_ids)->with('product')->get();
 
         if ($orders->isEmpty()) {
             return redirect()->back()->withErrors(['error' => 'Pesanan tidak ditemukan.']);
         }
         
-        // Buat ID unik untuk transaksi Midtrans
-        $transactionCode = 'WARKOP-' . time();
+        // === PERUBAHAN DI SINI ===
+        // Gunakan order_code yang sudah ada dari pesanan pertama.
+        // Semua pesanan dalam grup ini memiliki kode yang sama.
+        $transactionCode = $orders->first()->order_code;
+        // =========================
 
         $item_details = [];
         foreach($orders as $order) {
@@ -49,7 +54,7 @@ class PaymentController extends Controller
 
         $params = [
             'transaction_details' => [
-                'order_id' => $transactionCode,
+                'order_id' => $transactionCode, // Gunakan kode yang sudah ada
                 'gross_amount' => $request->total_price,
             ],
             'item_details' => $item_details,
@@ -63,13 +68,13 @@ class PaymentController extends Controller
         try {
             $snapToken = Snap::getSnapToken($params);
             
-            // Simpan snap_token ke semua order yang terkait
+            // === PERUBAHAN DI SINI ===
+            // Cukup perbarui snap_token, karena order_code sudah benar.
             Order::whereIn('id', $request->order_ids)->update([
                 'snap_token' => $snapToken,
-                'order_code' => $transactionCode, // Gunakan kode transaksi yang sama
             ]);
+            // =========================
 
-            // Redirect ke halaman pembayaran
             return view('payment', compact('snapToken'));
 
         } catch (\Exception $e) {
@@ -84,7 +89,7 @@ class PaymentController extends Controller
         
         if ($hashed == $request->signature_key) {
             if ($request->transaction_status == 'capture' || $request->transaction_status == 'settlement') {
-                // Cari pesanan berdasarkan order_code
+                // Semua pesanan dengan order_code yang sama akan diperbarui statusnya.
                 Order::where('order_code', $request->order_id)->update(['payment_status' => 'paid']);
             }
         }
